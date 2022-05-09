@@ -81,6 +81,11 @@ export class Zoo {
         return true;
     }
 
+    addPost(userName: string, post: string) {
+        const user = this.getUserByName(userName);
+        return user.addPost(post);
+    }
+
     getUserByName(name: string) {
         return this.users.find((user) => user.name === name) || null;
     }
@@ -101,12 +106,6 @@ export class Zoo {
                 const postAuthor = this.getUserByName(post.author);
                 const postAuthorIsFollowedByCount =
                     postAuthor.isFollowedBy.length;
-
-                console.log(
-                    'author',
-                    postAuthor.name,
-                    postAuthorIsFollowedByCount
-                );
                 const postAuthorLikesText = postAuthorIsFollowedByCount
                     ? ` (${postAuthorIsFollowedByCount} like${
                           postAuthorIsFollowedByCount === 1 ? '' : 's'
@@ -164,6 +163,17 @@ export class CLI {
             const newUser = new User(name);
             this.zoo.addUser(newUser);
             return `user ${name} created`;
+        }
+
+        const addPostReg = new RegExp(/([A-Z]\w+)\s\-\>(.*)/);
+        const addPostRegMatch = input.match(addPostReg);
+        if (addPostRegMatch) {
+            const userName = addPostRegMatch[1];
+            const post = addPostRegMatch[2];
+            const success = !!this.zoo.addPost(userName, post);
+            if (success) {
+                return `${userName} added a post`;
+            }
         }
 
         const followReg = new RegExp(/([A-Z]\w+)\sfollows\s([A-Z]\w+)/);

@@ -1,39 +1,45 @@
-#!/usr/bin/env node
+#!/usr/bin/env ts-node
 
-import { Command } from 'commander';
+// const chalk = require('chalk');
+import readline from 'readline-sync';
+import { CLI, User, Zoo } from './Zoo';
 
-function buildSayCmd(): Command {
-    return new Command()
-        .name('say')
-        .description('Say the word passed as the first argument')
-        .argument('<word>')
-        .action((word: string) => console.log(word));
+console.log('WELCOME TO ZOOPLA ZOO!');
+
+const userName = readline.question('Enter your name: ');
+const animals = ['dolphin', 'bear', 'octopus'];
+const animalIndex = readline.keyInSelect(animals, 'Choose an animal:');
+
+console.log(`Thanks, ${userName} the ${animals[animalIndex]}.`);
+
+const zoo = new Zoo();
+const cli = new CLI(zoo);
+
+zoo.addUser(new User(userName));
+
+function checkForFurtherInput() {
+    const input = readline.question(`
+        What would you like to do next? Your options:
+    
+        - Add another animal - "add [name]"
+    
+        - Post - "${userName} -> [your message]"
+    
+        - Follow an animal's posts - "[username] follows [username]"
+    
+        - Unfollow an animal's posts - "[username] unfollows [username]"
+    
+        - Quit - "quit"
+    `);
+
+    if (input === 'quit') {
+        console.log('OK BAI');
+        return;
+    } else {
+        const response = cli.input(input);
+        console.log(response);
+        checkForFurtherInput();
+    }
 }
 
-const HELLO = 'Hello!';
-
-function buildCmd(): Command {
-    const command = new Command()
-        .option('-g, --greet', `Say ${HELLO}`, false)
-        .addCommand(buildSayCmd())
-        .addHelpCommand()
-        .showHelpAfterError();
-
-    command.action((options) => {
-        if (options.greet) {
-            console.log(HELLO);
-            return;
-        }
-
-        command.help();
-    });
-
-    return command;
-}
-
-const isExecutedAsScript = require.main === module;
-if (isExecutedAsScript) {
-    const cmd = buildCmd();
-
-    cmd.parse(process.argv);
-}
+checkForFurtherInput();

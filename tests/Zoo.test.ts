@@ -41,6 +41,14 @@ describe('CLI', () => {
         );
     });
 
+    it('can add a post for a user', () => {
+        const testUser = new User('Alice');
+        testZoo.addUser(testUser);
+        const output = testCLI.input('Alice -> I feel rotten today');
+        expect(output).toBe('Alice added a post');
+        expect(testUser.posts.length).toBe(1);
+    });
+
     it("can view a user's timeline", () => {
         const testName = 'Alice';
         const testUser = new User(testName);
