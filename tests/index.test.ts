@@ -1,0 +1,1 @@
+test('can run main', () => {});
